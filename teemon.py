@@ -33,6 +33,13 @@ def send_medp(socket, command):
     socket.send(MEDP_START + command + MEDP_END)
 
 
+def test_angle(socket, direction, angle):
+    command = direction + str(angle)
+    send_medp(socket, command)
+    result = 0  # TODO get angle from magnetometer
+    print "{0:1}, {1:3}, {2:4}".format(direction, angle, result)
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='Move Poomba and execute tests on it',
@@ -59,6 +66,9 @@ def main():
 
     if arguments.test:
         socket = get_connected_socket()
+        for direction in ['l', 'r']:
+            for angle in range(1, 361):
+                test_angle(socket, direction, angle)
         socket.close()
 
     elif arguments.interactive:
