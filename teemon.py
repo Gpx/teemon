@@ -9,15 +9,13 @@ def signal_handler(signal, frame):
     sys.exit(0)
 
 
-def get_connected_socket(verbose):
+def get_connected_socket():
     service = lightblue.selectservice()
     if service == None:
         sys.exit(0)
     socket = lightblue.socket()
     socket.connect((service[0], service[1]))
     signal.signal(signal.SIGINT, signal_handler)
-    if verbose:
-        print 'You are now connected. Press Ctrl+D to exit.'
     return socket
 
 
@@ -56,26 +54,31 @@ def main():
         action='store_true',
         help='start default tests on Poomba and dysplay results'
     )
-    parser.add_argument(
-        '-v', '--no-verbose',
-        action='store_false',
-        help='disable help messages'
-    )
 
     arguments = parser.parse_args()
 
     if arguments.test:
-        pass
+        socket = get_connected_socket()
+        socket.close()
+
     elif arguments.interactive:
-        socket = get_connected_socket(arguments.no_verbose)
+        socket = get_connected_socket()
+        print "You are now connected. Press Ctrl+D to exit."
         while True:
             try:
                 command = raw_input()
             except EOFError:
                 exit(0)
             send_medp(socket, command)
+
     elif arguments.move != None:
-        socket = get_connected_socket(arguments.no_verbose)
+        socket = get_connected_socket()
+        for file in arguments.move:
+            print 'Sending content of %s... ' % file.name,
+            send_medp(socket, file.read())
+            print 'done'
+        socket.close()
+
     else:
         parser.print_help()
 
