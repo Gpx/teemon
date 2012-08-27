@@ -17,7 +17,7 @@ def get_connected_socket(use_default_socket):
     else:
         service = DEFAULT_SERVICE
 
-    if service == None:  # Used when user click on cancel
+    if service == None:  # Used when user clicks on cancel
         sys.exit(0)
 
     socket = lightblue.socket()
