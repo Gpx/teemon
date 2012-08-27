@@ -79,7 +79,8 @@ def main():
                 command = raw_input()
             except EOFError:
                 exit(0)
-            send_medp(socket, command)
+            else:
+                send_medp(socket, command)
 
     elif arguments.move != None:
         socket = get_connected_socket()
