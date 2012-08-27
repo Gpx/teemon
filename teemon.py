@@ -4,15 +4,22 @@ import lightblue
 import signal
 import sys
 
+DEFAULT_SERVICE = ('00:06:66:42:92:73', 1, 'SPP')
+
 
 def signal_handler(signal, frame):
     sys.exit(0)
 
 
-def get_connected_socket():
-    service = lightblue.selectservice()
-    if service == None:
+def get_connected_socket(use_default_socket):
+    if not use_default_socket:
+        service = lightblue.selectservice()
+    else:
+        service = DEFAULT_SERVICE
+
+    if service == None:  # Used when user click on cancel
         sys.exit(0)
+
     socket = lightblue.socket()
     socket.connect((service[0], service[1]))
     signal.signal(signal.SIGINT, signal_handler)
@@ -61,18 +68,23 @@ def main():
         action='store_true',
         help='start default tests on Poomba and dysplay results'
     )
+    parser.add_argument(
+        '-d', '--default',
+        action='store_false',
+        help=('do not connect to the default bluetooth device [%s]' % DEFAULT_SERVICE[0])
+    )
 
     arguments = parser.parse_args()
 
     if arguments.test:
-        socket = get_connected_socket()
+        socket = get_connected_socket(arguments.default)
         for direction in ['l', 'r']:
             for angle in range(1, 361):
                 test_angle(socket, direction, angle)
         socket.close()
 
     elif arguments.interactive:
-        socket = get_connected_socket()
+        socket = get_connected_socket(arguments.default)
         print "You are now connected. Press Ctrl+D to exit."
         while True:
             try:
@@ -83,7 +95,7 @@ def main():
                 send_medp(socket, command)
 
     elif arguments.move != None:
-        socket = get_connected_socket()
+        socket = get_connected_socket(arguments.default)
         for file in arguments.move:
             print 'Sending content of %s... ' % file.name,
             send_medp(socket, file.read())
