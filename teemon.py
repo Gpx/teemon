@@ -3,6 +3,7 @@ import argparse
 import lightblue
 import signal
 import sys
+import time
 
 DEFAULT_SERVICE = ('00:06:66:42:92:73', 1, 'SPP')
 
@@ -40,10 +41,23 @@ def send_medp(socket, command):
     socket.send(MEDP_START + command + MEDP_END)
 
 
+def get_angle(socket):
+    angle = ""
+    while True:
+        recv = socket.recv(1)
+        if ord(recv) == 13:
+            continue
+        if ord(recv) == 10:
+            break
+        angle += recv
+    return float(angle)
+
+
 def test_angle(socket, direction, angle):
+    time.sleep(2)
     command = direction + str(angle)
     send_medp(socket, command)
-    result = 0  # TODO get angle from magnetometer
+    result = get_angle(socket)  # TODO get angle from magnetometer
     print "{0:1}, {1:3}, {2:4}".format(direction, angle, result)
 
 
@@ -79,7 +93,7 @@ def main():
     if arguments.test:
         socket = get_connected_socket(arguments.default)
         for direction in ['l', 'r']:
-            for angle in range(1, 361):
+            for angle in range(1, 361, 10):
                 test_angle(socket, direction, angle)
         socket.close()
 
