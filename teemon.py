@@ -57,7 +57,7 @@ def test_angle(socket, direction, angle):
     time.sleep(2)
     command = direction + str(angle)
     send_medp(socket, command)
-    result = get_angle(socket)  # TODO get angle from magnetometer
+    result = get_angle(socket)
     print "{0:1}, {1:3}, {2:4}".format(direction, angle, result)
 
 
