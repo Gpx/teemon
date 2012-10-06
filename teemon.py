@@ -36,7 +36,7 @@ def send_medp(socket, command):
         command = command[len(MEDP_START):]
     if MEDP_END in command:
         command = command[-len(MEDP_END)]
-    command = command.upper().replace(' ', MEDP_COMMAND_SEPARATOR)
+    command = command.replace(' ', MEDP_COMMAND_SEPARATOR)
 
     socket.send(MEDP_START + command + MEDP_END)
 
@@ -93,7 +93,7 @@ def main():
     if arguments.test:
         socket = get_connected_socket(arguments.default)
         for direction in ['l', 'r']:
-            for angle in range(1, 361, 10):
+            for angle in range(1, 361, 5):
                 test_angle(socket, direction, angle)
         socket.close()
 
